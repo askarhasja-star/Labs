@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход в библиотеку</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f3f3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            padding: 25px;
+            width: 320px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #2d7af1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1e5ec4;
+        }
+
+        #dashboard {
+            display: none;
+        }
+
+        .logout {
+            background: #e74c3c;
+            margin-top: 20px;
+        }
+        .logout:hover {
+            background: #c0392b;
+        }
+
+        #userList {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            display: none;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div id="loginForm">
+        <h2>Вход в библиотеку</h2>
+        <input id="email" type="email" placeholder="Email">
+        <input id="password" type="password" placeholder="Пароль">
+        <button onclick="login()">Войти</button>
+    </div>
+
+    <div id="dashboard">
+        <h2>Добро пожаловать!</h2>
+        <p>Вы успешно вошли в систему библиотеки.</p>
+        <p><b>Ваш токен:</b></p>
+        <pre id="tokenBox"></pre>
+
+        <button onclick="showUsers()">Показать пользователей</button>
+        <pre id="userList"></pre>
+
+        <button class="logout" onclick="logout()">Выйти</button>
+    </div>
+
+</div>
+
+<script>
+
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    window.onload = () => {
+        const token = localStorage.getItem("jwt_token");
+        if (token) {
+            showDashboard(token);
+        }
+    };
+
+    function login() {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            alert("Введите email и пароль!");
+            return;
+        }
+
+        const fakeToken = "fake-jwt-token-" + Math.random().toString(36).substring(2);
+
+        localStorage.setItem("jwt_token", fakeToken);
+
+        const newUser = {
+            email: email,
+            time: new Date().toLocaleString()
+        };
+
+        users.push(newUser);
+        localStorage.setItem("users", JSON.stringify(users));
+
+        showDashboard(fakeToken);
+    }
+
+    function showDashboard(token) {
+        document.getElementById("loginForm").style.display = "none";
+        document.getElementById("dashboard").style.display = "block";
+        document.getElementById("tokenBox").textContent = token;
+    }
+
+    function showUsers() {
+        const listBox = document.getElementById("userList");
+        const savedUsers = JSON.parse(localStorage.getItem("users")) || [];
+
+        if (savedUsers.length === 0) {
+            listBox.textContent = "Пока никто не входил.";
+        } else {
+            listBox.textContent = savedUsers
+                .map(u => `Email: ${u.email}\nВход: ${u.time}`)
+                .join("\n\n");
+        }
+
+        listBox.style.display = "block";
+    }
+
+    function logout() {
+        localStorage.removeItem("jwt_token");
+        location.reload(); 
+    }
+</script>
+</body>
+</html>
