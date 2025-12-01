@@ -1,0 +1,11 @@
+{
+    "name": "lab14",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+      "test": "jest"
+    },
+    "devDependencies": {
+      "jest": "^29.7.0"
+    }
+  }
